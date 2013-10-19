@@ -1,0 +1,29 @@
+{
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "name": "sessions-pg-store",
+  "description": "Postgresql Store for the Sessions module",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/connrs/node-sessions-pg-store.git"
+  },
+  "main": "lib/sessions-pg-store.js",
+  "scripts": {
+    "test": "node_modules/tape/bin/tape test/*.js"
+  },
+  "licenses": [
+    {
+      "type": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    }
+  ],
+  "author": "connrs",
+  "dependencies": {
+    "xtend": "~2.1.1"
+  },
+  "devDependencies": {
+    "tape": "~2.0.0"
+  }
+}
