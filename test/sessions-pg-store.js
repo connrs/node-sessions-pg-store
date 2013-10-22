@@ -8,7 +8,7 @@ var client = {};
 
 function noop() {}
 
-test('Throw no client error', function (t) {
+test.only('Throw no client error', function (t) {
   t.plan(1);
   t.throws(store.bind(this), /No pg when creating session store/);
 });
@@ -23,7 +23,7 @@ test('Returns error if error connecting', function (t) {
     t.equal(conString, testConString);
     done(new Error('PGSQL ERROR'));
   };
-  store(pg, conString).add('AAA1', {}, {}, function (err) {
+  store({pg: pg, conString: conString}).add('AAA1', {}, {}, function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -46,7 +46,7 @@ test('Add session', function (t) {
     t.deepEqual(data, JSON.parse(params[2]));
     done();
   };
-  store(pg, conString).add(uid, meta, data, function () {});
+  store({pg: pg, conString: conString}).add(uid, meta, data, function () {});
 });
 
 test('Callback with error if add session error', function (t) {
@@ -61,7 +61,7 @@ test('Callback with error if add session error', function (t) {
   client.query = function (query, params, done) {
     done(new Error('PGSQL ERROR'));
   };
-  store(pg, conString).add(uid, null, data, function (err) {
+  store({pg: pg, conString: conString}).add(uid, null, data, function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -79,7 +79,7 @@ test('Callback with meta and data if add session successful', function (t) {
   client.query = function (query, params, done) {
     done();
   };
-  store(pg, conString).add(uid, meta, data, function (err, outMeta, outData) {
+  store({pg: pg, conString: conString}).add(uid, meta, data, function (err, outMeta, outData) {
     t.error(err);
     t.deepEqual(meta, outMeta);
     t.deepEqual(data, outData);
@@ -99,7 +99,7 @@ test('Closes client after add session', function (t) {
   client.query = function (query, params, done) {
     done();
   };
-  store(pg, conString).add(uid, meta, data, function (err, outMeta, outData) {
+  store({pg: pg, conString: conString}).add(uid, meta, data, function (err, outMeta, outData) {
   });
 });
 
@@ -114,7 +114,7 @@ test('Get UIDs', function (t) {
     t.equal(query, 'SELECT uid\nFROM session\nWHERE deleted_at IS NULL');
     done(null, {rows: []});
   };
-  store(pg, conString).uids(function () {});
+  store({pg: pg, conString: conString}).uids(function () {});
 });
 
 test('Callback with error if get UIDs error', function (t) {
@@ -127,7 +127,7 @@ test('Callback with error if get UIDs error', function (t) {
   client.query = function (query, params, done) {
     done(new Error('PGSQL ERROR'), null, function () {});
   };
-  store(pg, conString).uids(function (err) {
+  store({pg: pg, conString: conString}).uids(function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -147,7 +147,7 @@ test('Callback with UIDs if successful', function (t) {
       ]
     }, function () {});
   };
-  store(pg, conString).uids(function (err, uids) {
+  store({pg: pg, conString: conString}).uids(function (err, uids) {
     t.deepEqual(uids, ['ABC1', 'ABC2']);
   });
 });
@@ -167,7 +167,7 @@ test('Closes client after fetching UIDs', function (t) {
       ]
     });
   };
-  store(pg, conString).uids(function (err, uids) {
+  store({pg: pg, conString: conString}).uids(function (err, uids) {
   });
 });
 
@@ -183,7 +183,7 @@ test('Set session data runs SELECT', function (t) {
     t.deepEqual(params, ['ABC1']);
     done(null, {rows: []});
   };
-  store(pg, conString).set('ABC1', {a: 1}, {b: 2}, function () {});
+  store({pg: pg, conString: conString}).set('ABC1', {a: 1}, {b: 2}, function () {});
 });
 
 test('Set session data error on first SELECT', function (t) {
@@ -196,7 +196,7 @@ test('Set session data error on first SELECT', function (t) {
   client.query = function (query, params, done) {
     done(new Error('PGSQL ERROR'));
   };
-  store(pg, conString).set('ABC1', {a: 1}, {b: 2}, function (err) {
+  store({pg: pg, conString: conString}).set('ABC1', {a: 1}, {b: 2}, function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -225,7 +225,7 @@ test('Set session data runs UPDATE', function (t) {
       ]
     });
   };
-  store(pg, conString).set('ABC1', {y: 4}, {z: 3}, function (err) {
+  store({pg: pg, conString: conString}).set('ABC1', {y: 4}, {z: 3}, function (err) {
     t.error(err);
   });
 });
@@ -250,7 +250,7 @@ test('Set session data update returns error', function (t) {
       ]
     });
   };
-  store(pg, conString).set('ABC1', {y: 4}, {z: 3}, function (err) {
+  store({pg: pg, conString: conString}).set('ABC1', {y: 4}, {z: 3}, function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -275,7 +275,7 @@ test('Set session closes client on completion', function (t) {
       ]
     });
   };
-  store(pg, conString).set('ABC1', {y: 4}, {z: 3}, function (err) {
+  store({pg: pg, conString: conString}).set('ABC1', {y: 4}, {z: 3}, function (err) {
   });
 });
 
@@ -291,7 +291,7 @@ test('Get session data', function (t) {
     t.deepEqual(params, ['ABC1']);
     done(null, {rows: []});
   };
-  store(pg, conString).get('ABC1', function () {});
+  store({pg: pg, conString: conString}).get('ABC1', function () {});
 });
 
 test('Get session data returns error', function (t) {
@@ -304,7 +304,7 @@ test('Get session data returns error', function (t) {
   client.query = function (query, params, done) {
     done(new Error('PGSQL ERROR'));
   };
-  store(pg, conString).get('ABC1', function (err) {
+  store({pg: pg, conString: conString}).get('ABC1', function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -322,7 +322,7 @@ test('Get session data returns meta & data', function (t) {
       data: JSON.stringify({b: 2})
     }]});
   };
-  store(pg, conString).get('ABC1', function (err, meta, data) {
+  store({pg: pg, conString: conString}).get('ABC1', function (err, meta, data) {
     t.deepEqual(meta, {a: 1});
     t.deepEqual(data, {b: 2});
   });
@@ -340,7 +340,7 @@ test('Remove session data', function (t) {
     t.deepEqual(params, ['ABC']);
     done();
   };
-  store(pg, conString).remove('ABC', function () {});
+  store({pg: pg, conString: conString}).remove('ABC', function () {});
 });
 
 test('Remove session data return error', function (t) {
@@ -353,7 +353,7 @@ test('Remove session data return error', function (t) {
   client.query = function (query, params, done) {
     done(new Error('PGSQL ERROR'));
   };
-  store(pg, conString).remove('ABC', function (err) {
+  store({pg: pg, conString: conString}).remove('ABC', function (err) {
     t.equal(err.message, 'PGSQL ERROR');
   });
 });
@@ -370,7 +370,7 @@ test('Remove session returns no error', function (t) {
 
     });
   };
-  store(pg, conString).remove('ABC', function (err) {
+  store({pg: pg, conString: conString}).remove('ABC', function (err) {
     t.ok(!err);
   });
 });
